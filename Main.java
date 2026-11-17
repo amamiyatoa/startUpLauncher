@@ -13,6 +13,7 @@ public final class Main extends JFrame{
     private final int winWidth = 854;
     private final int winHeight = 480;
     private final Path launchAppFile = setPath("launch.lcr");
+    private boolean startUp = false;
     
     private final String version = "0.0.1";
     
@@ -26,10 +27,12 @@ public final class Main extends JFrame{
     private final JMenu file = new JMenu("File(_F)");
     private final JMenuItem openFile = new JMenuItem("Open File");
     private final JMenuItem ver = new JMenuItem("Version");
+    private final JCheckBoxMenuItem start = new JCheckBoxMenuItem("StartUp");
     
     
     private Main() {
         init();
+        startUp();
     }
     
     public void init(){
@@ -72,17 +75,22 @@ public final class Main extends JFrame{
             }
         });
         
+        start.addActionListener(e -> {
+            startUp = start.getState();
+        });
+        
         ver.addActionListener(e -> {
             JOptionPane.showMessageDialog(
                 this,
-                "Version: " + version,
+                "Version: " + version + "\nStartUp: " + startUp,
                 "Version Information",
                 JOptionPane.INFORMATION_MESSAGE
             );
         });
         
-        file.add(ver);
         file.add(openFile);
+        file.add(start);
+        file.add(ver);
         menubar.add(file);
         setJMenuBar(menubar);
         
@@ -95,7 +103,7 @@ public final class Main extends JFrame{
             String pathString = launcherAppPath.toString();
             
             try(FileWriter writer = new FileWriter(pathString, overwrite)) {
-                String writeData = "\n" + wroteData;
+                String writeData = wroteData + "\n";
                 writer.write(writeData);
             } catch(IOException fileEx) {
                 System.err.println("[Fatal]" + fileEx.getMessage());
@@ -122,19 +130,22 @@ public final class Main extends JFrame{
     }
     
     public void startUp() {
-        Path launchAppPath = getPath();
-        try {
-            List<String> paths = Files.readAllLines(launchAppPath);
-            for (String path : paths) {
-                try {
-                    fileOpener(path);
-                } catch (IOException e) {
-                    System.err.println("[Fatal] " + e.getMessage());
+        if(startUp) {
+            Path launchAppPath = getPath();
+            try {
+                List<String> paths = Files.readAllLines(launchAppPath);
+                for (String path : paths) {
+                    try {
+                        fileOpener(path);
+                    } catch (IOException e) {
+                        System.err.println("[Fatal] " + e.getMessage());
+                    }
                 }
+            } catch (IOException fileEx) {
+                System.err.println("[Fatal] " + fileEx.getMessage());
             }
-        } catch (IOException fileEx) {
-            System.err.println("[Fatal] " + fileEx.getMessage());
         }
+        
     }
     
     public void refreshDisplay(List<String> appList) {
@@ -146,20 +157,19 @@ public final class Main extends JFrame{
             label.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e){
-                    switch(e.getButton()) {
-                        case MouseEvent.BUTTON1:
-                            try {
-                                fileOpener(app);
-                                System.out.println("[Start] " + app);
-                            } catch (IOException appErr) {
-                                System.err.println("[Fatal] " + appErr.getMessage());
-                            }
-                        case MouseEvent.BUTTON2:
-                            try {
-                                removePath(appList, app);
-                            } catch (Exception appErr) {
-                                System.err.println("[Fatal] " + appErr.getMessage());
-                            }
+                    if(e.getButton() == MouseEvent.BUTTON1) {
+                        try {
+                            fileOpener(app);
+                            System.out.println("[Start] " + app);
+                        } catch (IOException appErr) {
+                            System.err.println("[Fatal] " + appErr.getMessage());
+                        }
+                    } else if(e.getButton() == MouseEvent.BUTTON3) {
+                        try {
+                            removePath(appList, app);
+                        } catch (Exception appErr) {
+                            System.err.println("[Fatal] " + appErr.getMessage());
+                        }
                     }
                 }
             });
