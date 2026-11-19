@@ -13,7 +13,7 @@ public final class Main extends JFrame{
     private final int winWidth = 854;
     private final int winHeight = 480;
     private final Path launchAppFile = setPath("launch.lcr");
-    private boolean startUp = false;
+    private boolean startUp = new Config().getConfig().isStartUpEnabled;
     
     private final String version = "0.0.1";
     
@@ -41,6 +41,14 @@ public final class Main extends JFrame{
         setSize(winWidth, winHeight);
         setResizable(false);
         setLocationRelativeTo(null);
+        
+        Config conf = new Config();
+        try {
+            conf.ReadConfig("config.lcr");
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        
         
         mainPanel = new JPanel();
         
@@ -80,12 +88,20 @@ public final class Main extends JFrame{
         });
         
         ver.addActionListener(e -> {
-            JOptionPane.showMessageDialog(
-                this,
-                "Version: " + version + "\nStartUp: " + startUp,
-                "Version Information",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+            try {
+                Config config = new Config();
+                config.ReadConfig("config.lcr");
+                startUp = conf.getConfig().isStartUpEnabled;
+                System.out.println(startUp);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Version: " + version + "\nStartUp: " + startUp,
+                        "Version Information",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (IOException ex) {
+                System.err.println(ex.getMessage());
+            }
         });
         
         file.add(openFile);
