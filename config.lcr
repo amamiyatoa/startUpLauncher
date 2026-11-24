@@ -1,2 +1,2 @@
-StartUp = true
+StartUp = false
 LaunchAppFile = ./launch.lcr

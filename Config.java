@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Config {
     private final Configuration conf;
+    String[] settings = {"StartUp", "LaunchAppFile"};
     public Config() {
         this.conf = new Configuration();
     }
@@ -14,6 +15,20 @@ public class Config {
     
     public void ReadConfig(String filePath) throws IOException {
         Properties prop = PropertiesHandler.load(filePath);
+        Path filePathToPath = Paths.get(filePath);
+        long fileLines = Files.lines(filePathToPath).count();
+        var result = "";
+
+        for(String out : settings) {
+            String searchSetting = prop.getProperty(out);
+            for(int i = 0; i < fileLines; i++) {
+                if(out.equalsIgnoreCase(settings[i])) {
+                    System.out.println("[Info] " + out + " was loaded: " + searchSetting);
+                }
+            }
+            System.out.println(result);
+        }
+
         String startUp = prop.getProperty("StartUp");
         if("TRUE".equalsIgnoreCase(startUp)) {
             conf.setConfig(true);
@@ -22,7 +37,7 @@ public class Config {
             conf.setConfig(false);
             System.out.println("startup: " + conf.isStartUpEnabled);
         } else {
-            System.err.println("[Fatal]: 設定の読み込みができませんでした。設定項目を確認してください。");
+            System.err.println("[Fatal] config.lcr was not fount.");
         }
     }
     
@@ -42,6 +57,10 @@ public class Config {
         
         public void setConfig(boolean enabled) {
             this.isStartUpEnabled = enabled;
+        }
+
+        public String getReadedConfig() {
+            return "S";
         }
     }
     

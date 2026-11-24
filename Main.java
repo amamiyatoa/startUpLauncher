@@ -182,8 +182,21 @@ public final class Main extends JFrame{
                         }
                     } else if(e.getButton() == MouseEvent.BUTTON3) {
                         try {
-                            removePath(appList, app);
-                        } catch (Exception appErr) {
+                            int confirmResult = JOptionPane.showConfirmDialog(
+                                null,
+                                app + "を削除しますか？",
+                                "確認",
+                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE
+                            );
+                            switch(confirmResult) {
+                                case JOptionPane.YES_OPTION -> removePath(appList, app);
+                                default -> System.out.println("[Info] remove was canceled.");
+                            }
+                            if(confirmResult == JOptionPane.YES_OPTION) {
+                                
+                            }
+                        } catch (HeadlessException appErr) {
                             System.err.println("[Fatal] " + appErr.getMessage());
                         }
                     }
